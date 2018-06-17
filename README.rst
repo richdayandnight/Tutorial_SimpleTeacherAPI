@@ -50,17 +50,17 @@ Setup procedure
 
         OR
 
-    C. Use the python interactive shell and run the lines below ::
-
-        $ python
-        >> from teacherAPI.database import init_db;
-        >> init_db();
-        >> from teacherAPI.populate import populate;
-        >> populate()
+    C. Use the python interactive shell and run the lines below 
+    
+        >>> python
+        >>> from teacherAPI.database import init_db;
+        >>> init_db();
+        >>> from teacherAPI.populate import populate;
+        >>> populate()
 
 4. Run app.py ::
 
-    python app.py
+>>> python app.py
 
 5. Refer to TeacherAPI controller on how to test the code through curl
 
