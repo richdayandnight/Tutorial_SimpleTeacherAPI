@@ -12,8 +12,11 @@ Overview on How to Run this API
 
 Setup procedure
 ================
-1. Configure project environment (Either A. Install Pycharm OR B. Create a Virtual Environment)
-    A. Install Pycharm (www.jetbrains.com/pycharm/download/)
+
+A. Configure project environment (Either A. Install Pycharm OR B. Create a Virtual Environment)
+------------------------------------------------------------------------------------------------
+
+    1. Install Pycharm (www.jetbrains.com/pycharm/download/)
         - Open the Teacher API Directory (File -> Open)
         - Configure the Base Project Interpreter (File -> Settings -> Project Interpreter)
             * Base Project Interpreter: pyenv version 3.6.2 ('path to .pyenv version 3.6.2'/bin/python)
@@ -23,7 +26,7 @@ Setup procedure
 
             pip install -r requirements.txt
 
-    B. Create a Python Virtual Environment
+    2. Create a Python Virtual Environment
         - Install virtualenv::
 
             sudo pip install virtualenv
@@ -36,33 +39,39 @@ Setup procedure
 
             pip install -r requirements.txt
 
-2. Install MySQL
-    A. Search on the web on how to install MySQL in your OS
-    B. Create database through piping
+B. Install MySQL
+-----------------
+
+    1. Search on the web on how to install MySQL in your OS
+    2. Create database through piping
             mysql -u root < <Path to file>/create_db.sql
          * NOTE: depending on your mysql config, you need to provide your password if you have one
-3. Initialize and Populate Company Database
-    A. Edit line 14 of teacherAPI/database.py and use the correct url to your mysql
+         
+C. Initialize and Populate Company Database
+---------------------------------------------
+
+    1. Edit line 14 of teacherAPI/database.py and use the correct url to your mysql
         * In my case, I'm using the root and has a password of 'password'
         'mysql://root:<password>@localhost/Teacher'
-    B. Either run the line below
-        $ sh database_populator.sh
+    2. Either (i) run the line below or (ii) Use the python interactive shell and run the lines below
+        A. 
+            $ sh database_populator.sh
 
-        OR
+        B.
+            $python
 
-    C. Use the python interactive shell and run the lines below 
-    
-        >>> python
-        >>> from teacherAPI.database import init_db;
-        >>> init_db();
-        >>> from teacherAPI.populate import populate;
-        >>> populate()
+            >>> from teacherAPI.database import init_db;
+            >>> init_db();
+            >>> from teacherAPI.populate import populate;
+            >>> populate()
 
-4. Run app.py ::
+D. Run app.py::
+---------------
 
->>> python app.py
+    python app.py
 
-5. Refer to TeacherAPI controller on how to test the code through curl
+E. Refer to TeacherAPI/controller.py on how to test the code through curl
+---------------------------------------------------------------------------
 
 Endpoints of the Teacher API
 ============================
