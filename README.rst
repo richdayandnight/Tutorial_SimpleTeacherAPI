@@ -50,7 +50,7 @@ Setup procedure
 
         OR
 
-    C. Use the python interactive shell and run the lines below::
+    C. Use the python interactive shell and run the lines below ::
 
         $ python
         >> from teacherAPI.database import init_db;
@@ -58,8 +58,18 @@ Setup procedure
         >> from teacherAPI.populate import populate;
         >> populate()
 
-4. Run app.py::
+4. Run app.py ::
 
     python app.py
 
 5. Refer to TeacherAPI controller on how to test the code through curl
+
+Endpoints of the Teacher API
+============================
+1. Insert a new teacher record
+2. Update an existing teacher record
+3. Delete teacher record
+4. Get teacher record details
+5. List all teacher records
+6. Filter list of teachers using wildcard search
+
