@@ -1,0 +1,387 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>teacherAPI.controller &#8212; Simple Teacher Data API 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for teacherAPI.controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: controller</span>
+<span class="sd">   :synopsis: All endpoints of the Teacher API are defined here</span>
+
+<span class="sd">.. moduleauthor:: Rich Yap &lt;github.com/richyap13&gt;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">abort</span><span class="p">,</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">Blueprint</span>
+<span class="kn">from</span> <span class="nn">teacherAPI.database</span> <span class="k">import</span> <span class="n">db_session</span>
+<span class="kn">from</span> <span class="nn">teacherAPI.models</span> <span class="k">import</span> <span class="n">Teacher</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">exc</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">teacher_api</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;teacher_api&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.index">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Get List of Teachers**</span>
+
+<span class="sd">        This function allows users to get a list of teachers and the subjects they&#39;re teaching.</span>
+
+<span class="sd">        :return: teacher&#39;s information in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">              curl -X GET http://localhost:5000/ -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 200</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;Teachers&quot;: [</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 1,</span>
+<span class="sd">                        &quot;name&quot;: &quot;Jane Vargas&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;Science&quot;</span>
+<span class="sd">                    },</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 2,</span>
+<span class="sd">                        &quot;name&quot;: &quot;John Doe&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;Math&quot;</span>
+<span class="sd">                    },</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 3,</span>
+<span class="sd">                        &quot;name&quot;: &quot;Jenny Lisa&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;English&quot;</span>
+<span class="sd">                    }</span>
+<span class="sd">                ]</span>
+<span class="sd">            }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">Teachers</span><span class="o">=</span><span class="p">[</span><span class="n">Teacher</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">Teacher</span> <span class="ow">in</span> <span class="n">teachers</span><span class="p">]),</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_teacher"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.create_teacher">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">create_teacher</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Create Teacher Record**</span>
+
+<span class="sd">        This function allows user to create(post) a teacher record.</span>
+
+<span class="sd">        :return: teacher&#39;s information added by the user in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">            curl -X POST http://localhost:5000/ -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39; \</span>
+<span class="sd">            -d &#39;{</span>
+<span class="sd">                &quot;name&quot;: &quot;Mary Rose&quot;,</span>
+<span class="sd">                &quot;subject&quot;: &quot;Biology&quot;</span>
+<span class="sd">            }&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 201</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;name&quot;: &quot;Mary Rose&quot;,</span>
+<span class="sd">                &quot;subject&quot;: &quot;Biology&quot;</span>
+<span class="sd">            }</span>
+
+<span class="sd">        - Expected Fail Response::</span>
+
+<span class="sd">            HTTP Status Code: 400</span>
+<span class="sd">            {&#39;error&#39;: &#39;Duplicate teacher name&#39;}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span><span class="s1">&#39;Teacher name should be a string&#39;</span><span class="p">}),</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">teacher_temp</span> <span class="o">=</span> <span class="n">Teacher</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                               <span class="n">subject</span><span class="o">=</span><span class="n">content</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">])</span>
+        <span class="n">db_session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">teacher_temp</span><span class="p">)</span>
+        <span class="n">db_session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">content</span><span class="p">),</span> <span class="mi">201</span>
+    <span class="k">except</span> <span class="n">exc</span><span class="o">.</span><span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Duplicate teacher name&#39;</span><span class="p">}),</span> <span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_teacher"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.get_teacher">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;int:teacher_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_teacher</span><span class="p">(</span><span class="n">teacher_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Get information of a specific teacher**</span>
+
+<span class="sd">        This function allows user to get a specific teacher&#39;s information through their teacher_id.</span>
+
+<span class="sd">        :param teacher_id: id of the teacher</span>
+<span class="sd">        :type teacher_id: int</span>
+<span class="sd">        :return: teacher&#39;s information accessed by user in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">            curl -X GET http://127.0.0.1:5000/1 -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 200</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;Teacher&quot;: {</span>
+<span class="sd">                    &quot;id&quot;: 1,</span>
+<span class="sd">                    &quot;name&quot;: &quot;Jane Vargas&quot;,</span>
+<span class="sd">                    &quot;subject&quot;: &quot;Science&quot;</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+
+<span class="sd">        - Expected Fail Response::</span>
+
+<span class="sd">            HTTP Status Code: 404</span>
+
+<span class="sd">            {&#39;error&#39;: &#39;Not found&#39;}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">teacher</span> <span class="o">=</span> <span class="p">[</span><span class="n">teacher</span> <span class="k">for</span> <span class="n">teacher</span> <span class="ow">in</span> <span class="n">teachers</span> <span class="k">if</span> <span class="n">teacher</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">teacher_id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">teacher</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">not_found</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">Teacher</span><span class="o">=</span><span class="n">Teacher</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">teacher</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_teacher"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.update_teacher">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;int:teacher_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PUT&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">update_teacher</span><span class="p">(</span><span class="n">teacher_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Update Information of a Specific Teacher Record**</span>
+
+<span class="sd">        This function allows user to update a specific teacher&#39;s information through their teacher_id.</span>
+
+<span class="sd">        :param teacher_id: id of the teacher</span>
+<span class="sd">        :type teacher_id: int</span>
+<span class="sd">        :return: teacher&#39;s information updated by user in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">            curl -X PUT http://localhost:5000/1 -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39; \</span>
+<span class="sd">            -d &#39;{</span>
+<span class="sd">                &quot;name&quot;: &quot;Jane Cruz&quot;,</span>
+<span class="sd">                &quot;subject&quot;: &quot;Science&quot;</span>
+<span class="sd">            }&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 200</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;name&quot;: &quot;Jane Cruz&quot;,</span>
+<span class="sd">                &quot;subject&quot;: &quot;Science&quot;</span>
+<span class="sd">            }</span>
+
+<span class="sd">        - Expected Fail Response::</span>
+
+<span class="sd">            HTTP Status Code: 404</span>
+
+<span class="sd">            {&#39;error&#39;: &#39;Not found&#39;}</span>
+
+<span class="sd">            or</span>
+
+<span class="sd">            HTTP Status Code: 404</span>
+
+<span class="sd">            {&#39;error&#39;: &#39;Duplicate teacher name&#39;}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">teacher</span> <span class="o">=</span> <span class="p">[</span><span class="n">teacher</span> <span class="k">for</span> <span class="n">teacher</span> <span class="ow">in</span> <span class="n">teachers</span> <span class="k">if</span> <span class="n">teacher</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">teacher_id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">teacher</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">not_found</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Teacher name not a string&#39;</span><span class="p">}),</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;subject&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Subject not a string&#39;</span><span class="p">}),</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="c1"># updating the requested teacher record</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">queried_teacher</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">teacher_id</span><span class="p">)</span>
+        <span class="n">queried_teacher</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">queried_teacher</span><span class="o">.</span><span class="n">subject</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span>
+        <span class="n">db_session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">content</span><span class="p">),</span> <span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">exc</span><span class="o">.</span><span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Duplicate teacher name&#39;</span><span class="p">}),</span> <span class="mi">400</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_teacher"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.delete_teacher">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;int:teacher_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;DELETE&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">delete_teacher</span><span class="p">(</span><span class="n">teacher_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Delete Teacher Record**</span>
+
+<span class="sd">        This function allows user to delete a teacher record.</span>
+
+<span class="sd">        :param teacher_id: id of the teacher</span>
+<span class="sd">        :type teacher_id: int</span>
+<span class="sd">        :return: delete status in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">            curl -X DELETE http://127.0.0.1:5000/4 -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 200</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;Delete&quot;: true</span>
+<span class="sd">            }</span>
+
+<span class="sd">        - Expected Fail Response::</span>
+
+<span class="sd">            HTTP Status Code: 404</span>
+
+<span class="sd">            {&#39;error&#39;: &#39;Not found&#39;}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">teacher</span> <span class="o">=</span> <span class="p">[</span><span class="n">teacher</span> <span class="k">for</span> <span class="n">teacher</span> <span class="ow">in</span> <span class="n">teachers</span> <span class="k">if</span> <span class="n">teacher</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">teacher_id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">teacher</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">not_found</span><span class="p">()</span>
+    <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">teacher_id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="n">db_session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;Delete&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}),</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.search">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/search&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">search</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Search Teacher Records**</span>
+
+<span class="sd">        This function allows user to search for teacher/s through substring search of teachers&#39; names.</span>
+
+<span class="sd">        :return: searched teachers in json and http status code</span>
+
+<span class="sd">        - Example::</span>
+
+<span class="sd">            curl -X POST  http://localhost:5000/search -H &#39;cache-control: no-cache&#39; -H &#39;content-type: application/json&#39; \</span>
+<span class="sd">            -d &#39;{</span>
+<span class="sd">                &quot;value&quot;: &quot;J&quot;</span>
+<span class="sd">            }&#39;</span>
+
+<span class="sd">        - Expected Success Response::</span>
+
+<span class="sd">            HTTP Status Code: 200</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;Teachers&quot;: [</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 1,</span>
+<span class="sd">                        &quot;name&quot;: &quot;Jane Cruz&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;Science&quot;</span>
+<span class="sd">                    },</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 2,</span>
+<span class="sd">                        &quot;name&quot;: &quot;John Doe&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;Math&quot;</span>
+<span class="sd">                    },</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;id&quot;: 3,</span>
+<span class="sd">                        &quot;name&quot;: &quot;Jenny Lisa&quot;,</span>
+<span class="sd">                        &quot;subject&quot;: &quot;English&quot;</span>
+<span class="sd">                    }</span>
+<span class="sd">                ]</span>
+<span class="sd">            }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;value&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">Teacher</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Teacher</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">+</span> <span class="s1">&#39;%&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">Teachers</span><span class="o">=</span><span class="p">[</span><span class="n">Teacher</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span> <span class="k">for</span> <span class="n">Teacher</span> <span class="ow">in</span> <span class="n">teachers</span><span class="p">]),</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<span class="c1"># Act as an error handler when a page is not found</span>
+<div class="viewcode-block" id="not_found"><a class="viewcode-back" href="../../index.html#teacherAPI.controller.not_found">[docs]</a><span class="nd">@teacher_api</span><span class="o">.</span><span class="n">errorhandler</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">not_found</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Error handler**</span>
+
+<span class="sd">        This function returns a not found error in json when called.</span>
+
+<span class="sd">        :return: not found error in json</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Not found&#39;</span><span class="p">}),</span> <span class="mi">404</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Rich Yap.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
