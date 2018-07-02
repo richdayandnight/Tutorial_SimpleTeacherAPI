@@ -87,6 +87,6 @@ Documentation
 ============================
 
     - Checkout my `Medium Article <https://medium.com/@richyap13/a-simple-tutorial-on-how-to-document-your-python-project-using-sphinx-and-rinohtype-177c22a15b5b/>`_ to learn how to document this repo using Sphinx.
-    - _`Swagger <https://swagger.io/>`_ is also another great option to document your API's
+    - `Swagger <https://swagger.io/>`_ is also another great option to document your API's
 
 
