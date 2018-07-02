@@ -82,3 +82,10 @@ Endpoints of the Teacher API
 5. List all teacher records
 6. Filter list of teachers using wildcard search
 
+
+Documentation
+============================
+    - Checkout my [Medium Article](https://medium.com/@richyap_13562/a-simple-tutorial-on-how-to-document-your-python-project-using-sphinx-and-rinohtype-177c22a15b5b) to learn how to document this repo using Sphinx.
+    - [Swagger](https://swagger.io/) is also another great option to document your API's
+
+
