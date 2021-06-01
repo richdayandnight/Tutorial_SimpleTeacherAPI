@@ -29,5 +29,5 @@ snowballstemmer==1.2.1
 Sphinx==1.7.5
 sphinxcontrib-websupport==1.1.0
 SQLAlchemy==1.2.8
-urllib3==1.23
+urllib3==1.26.5
 Werkzeug==0.14.1
